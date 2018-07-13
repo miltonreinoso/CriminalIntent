@@ -2,7 +2,7 @@ package com.bignerdranch.android.criminalintent;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.*;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,11 +18,18 @@ public class CrimeListFragment extends Fragment {
     private CrimeAdapter mAdapter;
 
     //ViewHolder
-    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        private Crime mCrime;
+    private class SuperCrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mTitleTextView;
         private TextView mDateTextView;
+        private Crime mCrime;
+
+        public SuperCrimeHolder(LayoutInflater inflater, ViewGroup parent, int layoutId) {
+            super(inflater.inflate(layoutId, parent, false));
+            itemView.setOnClickListener(this);
+
+            mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
+            mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
+        }
 
         public void bind(Crime crime) {
             mCrime = crime;
@@ -30,26 +37,32 @@ public class CrimeListFragment extends Fragment {
             mDateTextView.setText(mCrime.getDate().toString());
         }
 
-        public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item_crime, parent, false));
-            itemView.setOnClickListener(this);
-
-            mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
-            mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
-
+        public Crime getCrime() {
+            return mCrime;
         }
 
         @Override
-        public void onClick (View view){
+        public void onClick(View v) {
             Toast.makeText(getActivity(),
-                    mCrime.getTitle() + " cliked!", Toast.LENGTH_SHORT).show();
+                    getCrime().getTitle() + " clicked!", Toast.LENGTH_SHORT)
+                    .show();
         }
+    }
 
+    private class CrimeHolder extends SuperCrimeHolder {
+        public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater, parent, R.layout.list_item_crime);
+        }
+    }
 
+    private class PoliceCrimeHolder extends SuperCrimeHolder {
+        public PoliceCrimeHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater, parent, R.layout.require_police_list);
+        }
     }
 
     //Adapter
-    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
+    private class CrimeAdapter extends RecyclerView.Adapter<SuperCrimeHolder> {
         private List<Crime> mCrimes;
         public CrimeAdapter(List<Crime> crimes) {
             mCrimes = crimes;
@@ -57,18 +70,34 @@ public class CrimeListFragment extends Fragment {
 
 
         @Override
-        public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public SuperCrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new CrimeHolder(layoutInflater, parent);
-        }
+
+            switch (viewType){
+                case 0: return new PoliceCrimeHolder(layoutInflater, parent);
+                case 1: return new CrimeHolder(layoutInflater, parent);
+                }
+
+                return null;
+            }
         @Override
-        public void onBindViewHolder(CrimeHolder holder, int position) {
+        public void onBindViewHolder(SuperCrimeHolder holder, int position) {
+
             Crime crime = mCrimes.get(position);
             holder.bind(crime);
-        }
+            }
+
         @Override
         public int getItemCount() {
             return mCrimes.size();
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (mCrimes.get(position).isRequiresPolice())
+            {
+                return 0;}
+            else return 1;
         }
     }
 
