@@ -1,12 +1,16 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.media.Image;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.*;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,20 +25,22 @@ public class CrimeListFragment extends Fragment {
     private class SuperCrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mTitleTextView;
         private TextView mDateTextView;
+        private ImageView mSolvedImageView;
         private Crime mCrime;
 
         public SuperCrimeHolder(LayoutInflater inflater, ViewGroup parent, int layoutId) {
             super(inflater.inflate(layoutId, parent, false));
-            itemView.setOnClickListener(this);
 
             mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
             mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
+            mSolvedImageView = (ImageView) itemView.findViewById(R.id.crime_solved);
         }
 
         public void bind(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
             mDateTextView.setText(mCrime.getDate().toString());
+            mSolvedImageView.setVisibility(mCrime.isSolved() ? View.VISIBLE : View.GONE);
         }
 
         public Crime getCrime() {
@@ -52,12 +58,35 @@ public class CrimeListFragment extends Fragment {
     private class CrimeHolder extends SuperCrimeHolder {
         public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater, parent, R.layout.list_item_crime);
+            itemView.setOnClickListener(this);
         }
     }
 
     private class PoliceCrimeHolder extends SuperCrimeHolder {
+
+        private TextView mTitleTextView;
+        private TextView mDateTextView;
+        private Crime mCrime;
+
         public PoliceCrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater, parent, R.layout.require_police_list);
+
+            mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
+            mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
+            itemView.setOnClickListener(this);
+        }
+
+        public void onClick(View v) {
+            Toast.makeText(getActivity(), mCrime.getTitle() +
+                      " clicked!", Toast.LENGTH_SHORT)
+                    .show();
+        }
+
+        @Override
+        public void bind(Crime crime) {
+            mCrime = crime;
+            mTitleTextView.setText(mCrime.getTitle());
+            mDateTextView.setText(mCrime.getDate().toString());
         }
     }
 
