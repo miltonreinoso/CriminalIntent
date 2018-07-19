@@ -3,13 +3,15 @@ package com.bignerdranch.android.criminalintent;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class CrimeLab {
 
     private static CrimeLab sCrimeLab;
-    private List<Crime> mCrimes;
+    private Map<UUID, Crime> mCrimes;
 
 
     public static CrimeLab get(Context context) {
@@ -21,29 +23,26 @@ public class CrimeLab {
     }
 
     public List<Crime> getCrimes() {
-        return mCrimes;
+
+        return new ArrayList<>(mCrimes.values());
     }
 
 
     public Crime getCrime(UUID id){
-        for(Crime crime: mCrimes){
-            if(crime.getId().equals(id)) return crime;
-        }
-
-        return null;
+        return mCrimes.get(id);
     }
 
 
     //Singleton Private Constructor
     private CrimeLab(Context context){
 
-        mCrimes = new ArrayList<>();
+        mCrimes = new LinkedHashMap<>();
         for (int i = 1; i < 101; i++) {
             Crime crime = new Crime();
             crime.setTitle("Crime #" + i);
             crime.setSolved(i % 2 == 0); // Every other one
             if (i%5==0) crime.setRequiresPolice(true); //
-            mCrimes.add(crime);
+            mCrimes.put(crime.getId(), crime);
         }
 
     }

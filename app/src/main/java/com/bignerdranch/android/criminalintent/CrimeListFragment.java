@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.content.Intent;
 import android.media.Image;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -14,12 +15,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
 import java.util.List;
 
 public class CrimeListFragment extends Fragment {
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private DateFormat mDF = DateFormat.getDateInstance(DateFormat.FULL);
+    private int mClickedCrimePosition;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
 
     //ViewHolder
     private class SuperCrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -30,6 +40,7 @@ public class CrimeListFragment extends Fragment {
 
         public SuperCrimeHolder(LayoutInflater inflater, ViewGroup parent, int layoutId) {
             super(inflater.inflate(layoutId, parent, false));
+            itemView.setOnClickListener(this);
 
             mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
             mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
@@ -39,7 +50,8 @@ public class CrimeListFragment extends Fragment {
         public void bind(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
-            mDateTextView.setText(mCrime.getDate().toString());
+            mDateTextView.setText(mDF.format(this.mCrime.getDate()));
+            if (mSolvedImageView != null)
             mSolvedImageView.setVisibility(mCrime.isSolved() ? View.VISIBLE : View.GONE);
         }
 
@@ -49,45 +61,26 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(getActivity(),
-                    getCrime().getTitle() + " clicked!", Toast.LENGTH_SHORT)
-                    .show();
+            mClickedCrimePosition = getAdapterPosition();
+            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            startActivity(intent);
         }
     }
 
     private class CrimeHolder extends SuperCrimeHolder {
         public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater, parent, R.layout.list_item_crime);
-            itemView.setOnClickListener(this);
+
+
         }
     }
 
     private class PoliceCrimeHolder extends SuperCrimeHolder {
 
-        private TextView mTitleTextView;
-        private TextView mDateTextView;
-        private Crime mCrime;
-
         public PoliceCrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater, parent, R.layout.require_police_list);
-
-            mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
-            mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
-            itemView.setOnClickListener(this);
         }
 
-        public void onClick(View v) {
-            Toast.makeText(getActivity(), mCrime.getTitle() +
-                      " clicked!", Toast.LENGTH_SHORT)
-                    .show();
-        }
-
-        @Override
-        public void bind(Crime crime) {
-            mCrime = crime;
-            mTitleTextView.setText(mCrime.getTitle());
-            mDateTextView.setText(mCrime.getDate().toString());
-        }
     }
 
     //Adapter
@@ -133,8 +126,13 @@ public class CrimeListFragment extends Fragment {
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
-        mAdapter = new CrimeAdapter(crimes);
-        mCrimeRecyclerView.setAdapter(mAdapter);
+
+        if(mAdapter == null) {
+            mAdapter = new CrimeAdapter(crimes);
+            mCrimeRecyclerView.setAdapter(mAdapter);
+        }   else {
+            mAdapter.notifyItemChanged(mClickedCrimePosition);
+        }
     }
 
 
