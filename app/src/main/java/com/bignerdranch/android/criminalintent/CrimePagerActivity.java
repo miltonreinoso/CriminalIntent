@@ -10,6 +10,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,8 +21,10 @@ public class CrimePagerActivity extends AppCompatActivity {
     private static final String EXTRA_CRIME_ID =
             "com.bignerdranch.android.criminalintent.crime_id";
 
-    private ViewPager mViewPager;
+    public ViewPager mViewPager;
     private List<Crime> mCrimes;
+    private Button mFirstCrimeB;
+    private Button mLastCrimeB;
 
 
 
@@ -62,6 +66,46 @@ public class CrimePagerActivity extends AppCompatActivity {
             }
         }
 
-        //
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if(mViewPager.getCurrentItem() == 0) {
+                    mFirstCrimeB.setVisibility(View.GONE);
+                } else {
+                    mFirstCrimeB.setVisibility(View.VISIBLE);
+                }
+
+                if(mViewPager.getCurrentItem() == mViewPager.getAdapter().getCount()-1) {
+                    mLastCrimeB.setVisibility(View.GONE);
+                } else {
+                    mLastCrimeB.setVisibility(View.VISIBLE);
+                }
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+
+        mFirstCrimeB = findViewById(R.id.go_to_first_button);
+        mFirstCrimeB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mViewPager.setCurrentItem(0);
+            }
+        });
+
+        mLastCrimeB = findViewById(R.id.go_to_last_button);
+        mLastCrimeB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mViewPager.setCurrentItem(mViewPager.getAdapter().getCount()-1);
+            }
+        });
     }
 }

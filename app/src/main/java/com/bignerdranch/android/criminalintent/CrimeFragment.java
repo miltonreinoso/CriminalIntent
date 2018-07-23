@@ -15,7 +15,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import java.text.DateFormat;
-import java.util.Locale;
 import java.util.UUID;
 
 public class CrimeFragment extends Fragment {
@@ -27,6 +26,7 @@ public class CrimeFragment extends Fragment {
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
     private DateFormat mDF;
+
 
     public static CrimeFragment newInstance (UUID crimeID){
         Bundle args = new Bundle();
@@ -48,7 +48,6 @@ public class CrimeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         View v = inflater.inflate(R.layout.fragment_crime, container, false);
 
         mTitleField = (EditText) v.findViewById(R.id.crime_title) ;
