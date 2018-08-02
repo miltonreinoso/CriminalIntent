@@ -22,7 +22,6 @@ public class CrimeListFragment extends Fragment {
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
-    private DateFormat mDF = DateFormat.getDateInstance(DateFormat.FULL);
     private int mClickedCrimePosition;
 
     @Override
@@ -50,7 +49,7 @@ public class CrimeListFragment extends Fragment {
         public void bind(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
-            mDateTextView.setText(mDF.format(this.mCrime.getDate()));
+            mDateTextView.setText(mCrime.getDate().toString());
             if (mSolvedImageView != null)
             mSolvedImageView.setVisibility(mCrime.isSolved() ? View.VISIBLE : View.GONE);
         }
@@ -70,9 +69,7 @@ public class CrimeListFragment extends Fragment {
     private class CrimeHolder extends SuperCrimeHolder {
         public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater, parent, R.layout.list_item_crime);
-
-
-        }
+            }
     }
 
     private class PoliceCrimeHolder extends SuperCrimeHolder {
